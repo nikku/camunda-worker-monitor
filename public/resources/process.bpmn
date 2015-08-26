@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:fox="http://www.camunda.com/fox" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sid-fb0b1aa0-4798-4855-89ef-d31f89637fa1" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.3.1" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL">
+  <dataStore id="sid-0c324fc4-5cbf-4b95-be7b-68a99c27c2fe" isUnlimited="false" name="Inventory DB"/>
+  <error id="sid-6dfcbb5e-6320-443c-b804-4e84b0c404f4" errorCode="itemsOutOfStock"/>
+  <message id="sid-0fb91f4b-eff5-4ce1-ae9b-e95cdf68eb3d" name=""/>
+  <message id="sid-6F7766BD-6B0C-488F-9A63-6501A9C8B5E5" name="Cancellation&#xA;Email"/>
+  <message id="sid-914583D1-BCE9-484F-84F2-990BD723791E" name="New Order"/>
+  <message id="sid-25292E99-B66A-48E7-80D5-B0D8A01D8C9D" name="Confirmation&#xA;Email"/>
+  <collaboration id="sid-3cc40944-2f6c-43e5-b4a5-433b75392b11">
+    <participant id="sid-E01E6D20-5407-497C-A462-C3A0D92845B6" name="Order Process" processRef="sid-E1DEF3AA-1321-4DBE-9877-D18DDF51AC6D"/>
+  </collaboration>
+  <process id="sid-E1DEF3AA-1321-4DBE-9877-D18DDF51AC6D" name="Order Process" isExecutable="true">
+    <laneSet id="sid-4ba504ad-cdd6-44f2-9776-642f72ed4b7d">
+      <lane id="sid-DE5357BA-A002-4789-9C8C-BFE62740BF24">
+        <flowNodeRef>sid-9329FC09-BA1B-453B-B34C-B11713A46255</flowNodeRef>
+        <flowNodeRef>sid-F2EC54E7-D69F-466B-96A3-78385F1DB3CB</flowNodeRef>
+        <flowNodeRef>sid-3A7E6B25-4EA8-4A41-9B72-3DE9D47C74C0</flowNodeRef>
+        <flowNodeRef>sid-94C89724-EDD4-48D9-99AF-061E502E79E7</flowNodeRef>
+        <flowNodeRef>processPaymentService</flowNodeRef>
+        <flowNodeRef>sid-6BA6113B-9EE0-4A35-900D-A4EE5C43CED9</flowNodeRef>
+        <flowNodeRef>sid-0248164A-459E-4050-8D23-EF700BED9580</flowNodeRef>
+        <flowNodeRef>sid-96C43AFB-8924-4C45-ADCB-3CACF30E4892</flowNodeRef>
+        <flowNodeRef>sid-F939A9FD-B74B-4AC8-808E-45F9ABDB4437</flowNodeRef>
+        <flowNodeRef>sid-EE747842-EB5D-4905-80A0-73A0BCE166B2</flowNodeRef>
+        <flowNodeRef>sid-69C544B8-87A8-4EB7-80A1-36C10C807070</flowNodeRef>
+        <flowNodeRef>sid-0FE364B3-F436-4FFB-919C-F0C8B3483D77</flowNodeRef>
+        <flowNodeRef>sid-95888210-337C-4C03-BC3D-2B60D69B6210</flowNodeRef>
+        <flowNodeRef>sid-73454FC8-D69E-41B4-841D-E8E6870E1B04</flowNodeRef>
+        <flowNodeRef>sid-AC30AB02-8A00-46BB-92DF-49B1972BF77A</flowNodeRef>
+        <flowNodeRef>EndShipped2</flowNodeRef>
+        <flowNodeRef>sid-9EBE8626-3F1B-4E2F-9A31-7AD257B09798</flowNodeRef>
+        <flowNodeRef>EndOrderCancelled1</flowNodeRef>
+        <flowNodeRef>IntermediateThrowEvent_1</flowNodeRef>
+        <flowNodeRef>EndOrderCancelled2</flowNodeRef>
+        <flowNodeRef>sid-382F031A-2A5F-474D-A986-A148D42F4662</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="sid-9329FC09-BA1B-453B-B34C-B11713A46255" name="new order &#xA;recieved">
+      <outgoing>sid-CBBF786D-5FD8-4832-AAEC-F6A61EC39274</outgoing>
+      <messageEventDefinition id="sid-bc7aaa73-9ced-4c49-90b3-69cfa98d0ad0" messageRef="sid-914583D1-BCE9-484F-84F2-990BD723791E"/>
+    </startEvent>
+    <serviceTask id="sid-F2EC54E7-D69F-466B-96A3-78385F1DB3CB" activiti:expression="${processOrder.reserveOrderItems()}" activiti:async="true" name="Reserve Order Items" implementation="webService">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+      </extensionElements>
+      <incoming>sid-CBBF786D-5FD8-4832-AAEC-F6A61EC39274</incoming>
+      <outgoing>SequenceFlow_2</outgoing>
+    </serviceTask>
+    <boundaryEvent id="sid-3A7E6B25-4EA8-4A41-9B72-3DE9D47C74C0" name="items out &#xA;of stock" attachedToRef="sid-F2EC54E7-D69F-466B-96A3-78385F1DB3CB">
+      <outgoing>SequenceFlow_1</outgoing>
+      <errorEventDefinition id="sid-0fc7d50d-95a0-404a-9553-bbc1d7975699" errorRef="sid-6dfcbb5e-6320-443c-b804-4e84b0c404f4"/>
+    </boundaryEvent>
+    <sequenceFlow id="sid-CBBF786D-5FD8-4832-AAEC-F6A61EC39274" sourceRef="sid-9329FC09-BA1B-453B-B34C-B11713A46255" targetRef="sid-F2EC54E7-D69F-466B-96A3-78385F1DB3CB"/>
+    <dataStoreReference id="sid-A3B90950-4996-4066-8D10-E6395AB23860" name="Inventory DB" dataStoreRef="sid-0c324fc4-5cbf-4b95-be7b-68a99c27c2fe"/>
+    <sequenceFlow id="SequenceFlow_1" name="" sourceRef="sid-3A7E6B25-4EA8-4A41-9B72-3DE9D47C74C0" targetRef="EndOrderCancelled1"/>
+    <sequenceFlow id="SequenceFlow_2" name="" sourceRef="sid-F2EC54E7-D69F-466B-96A3-78385F1DB3CB" targetRef="IntermediateThrowEvent_1"/>
+    <exclusiveGateway id="sid-94C89724-EDD4-48D9-99AF-061E502E79E7" gatewayDirection="Converging">
+      <incoming>SequenceFlow_3</incoming>
+      <incoming>sid-87854BEF-2EDD-46FA-926A-FFFA2CFED346</incoming>
+      <outgoing>sid-1AD2E3C3-CB73-48D4-8FA6-D59B18DAB304</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="sid-1AD2E3C3-CB73-48D4-8FA6-D59B18DAB304" sourceRef="sid-94C89724-EDD4-48D9-99AF-061E502E79E7" targetRef="processPaymentService"/>
+    <serviceTask id="processPaymentService" activiti:expression="${processOrder.performPayment()}" activiti:async="true" name="Process Payment" implementation="webService">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+        <fox:failedJobRetryTimeCycle xsi:type="xsd:anyType">R100/PT15S</fox:failedJobRetryTimeCycle>
+      </extensionElements>
+      <incoming>sid-1AD2E3C3-CB73-48D4-8FA6-D59B18DAB304</incoming>
+      <outgoing>sid-598E5FAA-5922-49DD-8E82-C6BFCA30CA58</outgoing>
+    </serviceTask>
+    <sequenceFlow id="sid-598E5FAA-5922-49DD-8E82-C6BFCA30CA58" sourceRef="processPaymentService" targetRef="sid-0248164A-459E-4050-8D23-EF700BED9580"/>
+    <intermediateThrowEvent id="sid-6BA6113B-9EE0-4A35-900D-A4EE5C43CED9" name="Payment NOK">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+        <activiti:executionListener event="end" expression="${processOrder.status('PAYMENT_PROBLEMS')}"/>
+      </extensionElements>
+      <incoming>sid-9E9F4B93-8204-4206-80BF-475F9470AA50</incoming>
+      <outgoing>SequenceFlow_6</outgoing>
+    </intermediateThrowEvent>
+    <exclusiveGateway id="sid-0248164A-459E-4050-8D23-EF700BED9580" name="Payment &#xA;successful?" gatewayDirection="Diverging">
+      <incoming>sid-598E5FAA-5922-49DD-8E82-C6BFCA30CA58</incoming>
+      <outgoing>sid-9E9F4B93-8204-4206-80BF-475F9470AA50</outgoing>
+      <outgoing>sid-CB840199-14E7-4D75-889B-6C7AD565D647</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="sid-9E9F4B93-8204-4206-80BF-475F9470AA50" name="no" sourceRef="sid-0248164A-459E-4050-8D23-EF700BED9580" targetRef="sid-6BA6113B-9EE0-4A35-900D-A4EE5C43CED9">
+      <conditionExpression xsi:type="tFormalExpression" id="FormalExpression_2">${!isPaymentPerformed}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-CB840199-14E7-4D75-889B-6C7AD565D647" name="yes" sourceRef="sid-0248164A-459E-4050-8D23-EF700BED9580" targetRef="sid-0FE364B3-F436-4FFB-919C-F0C8B3483D77">
+      <conditionExpression xsi:type="tFormalExpression" id="FormalExpression_1">${isPaymentPerformed}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SequenceFlow_6" name="" sourceRef="sid-6BA6113B-9EE0-4A35-900D-A4EE5C43CED9" targetRef="sid-96C43AFB-8924-4C45-ADCB-3CACF30E4892"/>
+    <eventBasedGateway id="sid-96C43AFB-8924-4C45-ADCB-3CACF30E4892" gatewayDirection="Diverging">
+      <incoming>SequenceFlow_6</incoming>
+      <outgoing>sid-764C1FB8-5259-4CA5-AF1A-10F9671814E3</outgoing>
+      <outgoing>sid-ED12FE5C-464E-46C9-8428-99AA2714BE74</outgoing>
+      <outgoing>sid-AC059BC1-8E31-4C06-968F-50EB36132215</outgoing>
+    </eventBasedGateway>
+    <sequenceFlow id="sid-764C1FB8-5259-4CA5-AF1A-10F9671814E3" sourceRef="sid-96C43AFB-8924-4C45-ADCB-3CACF30E4892" targetRef="sid-69C544B8-87A8-4EB7-80A1-36C10C807070"/>
+    <sequenceFlow id="sid-ED12FE5C-464E-46C9-8428-99AA2714BE74" sourceRef="sid-96C43AFB-8924-4C45-ADCB-3CACF30E4892" targetRef="sid-F939A9FD-B74B-4AC8-808E-45F9ABDB4437"/>
+    <sequenceFlow id="sid-AC059BC1-8E31-4C06-968F-50EB36132215" sourceRef="sid-96C43AFB-8924-4C45-ADCB-3CACF30E4892" targetRef="sid-EE747842-EB5D-4905-80A0-73A0BCE166B2"/>
+    <intermediateCatchEvent id="sid-F939A9FD-B74B-4AC8-808E-45F9ABDB4437" name="Response &#xA;Deadline &#xA;expired">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+      </extensionElements>
+      <incoming>sid-ED12FE5C-464E-46C9-8428-99AA2714BE74</incoming>
+      <outgoing>sid-C0FFAF5F-739E-4638-8F44-259C96DF508A</outgoing>
+      <timerEventDefinition id="sid-a4261f7c-f21d-431a-a9bf-9a30ac182117">
+        <timeDuration xsi:type="tFormalExpression" id="_FormalExpression_3">PT1M</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <sequenceFlow id="sid-C0FFAF5F-739E-4638-8F44-259C96DF508A" sourceRef="sid-F939A9FD-B74B-4AC8-808E-45F9ABDB4437" targetRef="sid-9EBE8626-3F1B-4E2F-9A31-7AD257B09798"/>
+    <intermediateCatchEvent id="sid-EE747842-EB5D-4905-80A0-73A0BCE166B2" name="order cancelled">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+      </extensionElements>
+      <incoming>sid-AC059BC1-8E31-4C06-968F-50EB36132215</incoming>
+      <outgoing>sid-A077C184-791C-41C5-83DA-CED6B183E978</outgoing>
+      <messageEventDefinition id="sid-3033a14a-abd2-4768-a61f-a8e4f164e409" messageRef="Message_1"/>
+    </intermediateCatchEvent>
+    <sequenceFlow id="sid-A077C184-791C-41C5-83DA-CED6B183E978" sourceRef="sid-EE747842-EB5D-4905-80A0-73A0BCE166B2" targetRef="sid-9EBE8626-3F1B-4E2F-9A31-7AD257B09798"/>
+    <intermediateCatchEvent id="sid-69C544B8-87A8-4EB7-80A1-36C10C807070" name="Payment Options &#xA;updated&#xA;">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+      </extensionElements>
+      <incoming>sid-764C1FB8-5259-4CA5-AF1A-10F9671814E3</incoming>
+      <outgoing>sid-87854BEF-2EDD-46FA-926A-FFFA2CFED346</outgoing>
+      <messageEventDefinition id="sid-871df7c2-7a1b-4707-8e35-3a9839770d06" messageRef="Message_2"/>
+    </intermediateCatchEvent>
+    <sequenceFlow id="sid-87854BEF-2EDD-46FA-926A-FFFA2CFED346" sourceRef="sid-69C544B8-87A8-4EB7-80A1-36C10C807070" targetRef="sid-94C89724-EDD4-48D9-99AF-061E502E79E7"/>
+    <intermediateThrowEvent id="sid-0FE364B3-F436-4FFB-919C-F0C8B3483D77" name="Payment OK">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+        <activiti:executionListener event="end" expression="${processOrder.status('PAYMENT_PROCESSED')}"/>
+      </extensionElements>
+      <incoming>sid-CB840199-14E7-4D75-889B-6C7AD565D647</incoming>
+      <outgoing>sid-9BD856C0-4DB6-47E7-9425-8B1D3B38787E</outgoing>
+    </intermediateThrowEvent>
+    <sequenceFlow id="sid-9BD856C0-4DB6-47E7-9425-8B1D3B38787E" sourceRef="sid-0FE364B3-F436-4FFB-919C-F0C8B3483D77" targetRef="sid-95888210-337C-4C03-BC3D-2B60D69B6210"/>
+    <serviceTask id="sid-95888210-337C-4C03-BC3D-2B60D69B6210" activiti:expression="${true}" activiti:async="true" name="Adjust Inventory Data" implementation="webService">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+      </extensionElements>
+      <incoming>sid-9BD856C0-4DB6-47E7-9425-8B1D3B38787E</incoming>
+      <outgoing>sid-210A1C4D-85A5-45C2-88A6-551F4807D90D</outgoing>
+    </serviceTask>
+    <sequenceFlow id="sid-210A1C4D-85A5-45C2-88A6-551F4807D90D" sourceRef="sid-95888210-337C-4C03-BC3D-2B60D69B6210" targetRef="sid-73454FC8-D69E-41B4-841D-E8E6870E1B04"/>
+    <serviceTask id="sid-73454FC8-D69E-41B4-841D-E8E6870E1B04" activiti:expression="${true}" name="Trigger Shipment" implementation="webService">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+      </extensionElements>
+      <incoming>sid-210A1C4D-85A5-45C2-88A6-551F4807D90D</incoming>
+      <outgoing>sid-947F3EBE-B6CF-436E-97E5-6DE3D1E903AC</outgoing>
+    </serviceTask>
+    <sequenceFlow id="sid-947F3EBE-B6CF-436E-97E5-6DE3D1E903AC" sourceRef="sid-73454FC8-D69E-41B4-841D-E8E6870E1B04" targetRef="sid-AC30AB02-8A00-46BB-92DF-49B1972BF77A"/>
+    <intermediateCatchEvent id="sid-AC30AB02-8A00-46BB-92DF-49B1972BF77A" name="Shipment&#xA;performed">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+      </extensionElements>
+      <incoming>sid-947F3EBE-B6CF-436E-97E5-6DE3D1E903AC</incoming>
+      <outgoing>SequenceFlow_4</outgoing>
+      <messageEventDefinition id="sid-cdebc2ba-e97f-4842-a3fb-5b486f184611" messageRef="Message_3"/>
+    </intermediateCatchEvent>
+    <sequenceFlow id="SequenceFlow_4" name="" sourceRef="sid-AC30AB02-8A00-46BB-92DF-49B1972BF77A" targetRef="EndShipped2"/>
+    <endEvent id="EndShipped2" name="Order Shipped">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+        <activiti:executionListener event="end" expression="${processOrder.status('SHIPPED')}"/>
+      </extensionElements>
+      <incoming>SequenceFlow_4</incoming>
+    </endEvent>
+    <exclusiveGateway id="sid-9EBE8626-3F1B-4E2F-9A31-7AD257B09798" gatewayDirection="Converging">
+      <incoming>sid-C0FFAF5F-739E-4638-8F44-259C96DF508A</incoming>
+      <incoming>sid-A077C184-791C-41C5-83DA-CED6B183E978</incoming>
+      <outgoing>sid-8D53F495-8722-495C-8331-DF1C34AC364B</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="sid-8D53F495-8722-495C-8331-DF1C34AC364B" sourceRef="sid-9EBE8626-3F1B-4E2F-9A31-7AD257B09798" targetRef="sid-382F031A-2A5F-474D-A986-A148D42F4662"/>
+    <endEvent id="EndOrderCancelled1" name="Order &#xA;Cancelled">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+        <activiti:executionListener event="end" expression="${processOrder.status('CANCELLED')}"/>
+      </extensionElements>
+      <incoming>SequenceFlow_1</incoming>
+    </endEvent>
+    <intermediateThrowEvent id="IntermediateThrowEvent_1" name="Order Confirmed">
+      <extensionElements>
+        <activiti:executionListener event="end" expression="${processOrder.status('CONFIRMED')}"/>
+      </extensionElements>
+      <incoming>SequenceFlow_2</incoming>
+      <outgoing>SequenceFlow_3</outgoing>
+    </intermediateThrowEvent>
+    <sequenceFlow id="SequenceFlow_3" name="" sourceRef="IntermediateThrowEvent_1" targetRef="sid-94C89724-EDD4-48D9-99AF-061E502E79E7"/>
+    <endEvent id="EndOrderCancelled2" name="Order Cancelled">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+        <activiti:executionListener event="end" expression="${processOrder.status('CANCELLED')}"/>
+      </extensionElements>
+      <incoming>SequenceFlow_5</incoming>
+    </endEvent>
+    <serviceTask id="sid-382F031A-2A5F-474D-A986-A148D42F4662" activiti:expression="${processOrder.releaseOrderItemReservation()}" activiti:async="true" name="Release &#xA;Order Item Reservation" implementation="webService">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.fruitshop.application.dashboard.monitoring.MonitoringEventListener" event="end"/>
+      </extensionElements>
+      <incoming>sid-8D53F495-8722-495C-8331-DF1C34AC364B</incoming>
+      <outgoing>SequenceFlow_5</outgoing>
+    </serviceTask>
+    <sequenceFlow id="SequenceFlow_5" name="" sourceRef="sid-382F031A-2A5F-474D-A986-A148D42F4662" targetRef="EndOrderCancelled2"/>
+    <association id="sid-72DCAE08-07BA-4F60-A030-7E1135F47EAD" sourceRef="sid-A3B90950-4996-4066-8D10-E6395AB23860" targetRef="sid-95888210-337C-4C03-BC3D-2B60D69B6210"/>
+    <association id="sid-48F5BFC5-F025-46A8-8314-501DC21099C2" sourceRef="sid-382F031A-2A5F-474D-A986-A148D42F4662" targetRef="sid-A3B90950-4996-4066-8D10-E6395AB23860"/>
+    <association id="sid-BCF14BEE-0226-4B95-A2D2-7364BC0F7585" sourceRef="sid-F2EC54E7-D69F-466B-96A3-78385F1DB3CB" targetRef="sid-A3B90950-4996-4066-8D10-E6395AB23860"/>
+  </process>
+  <message id="Message_1" name="orderCancelled"/>
+  <message id="Message_2" name="paymentOptionsUpdated"/>
+  <message id="Message_3" name="shipmentPerformed"/>
+  <bpmndi:BPMNDiagram id="sid-b6e40928-a705-4908-8a35-0f3452f87ca9">
+    <bpmndi:BPMNPlane id="sid-d053c3e5-4887-44c7-a5f9-3cadf8fdb12f" bpmnElement="sid-3cc40944-2f6c-43e5-b4a5-433b75392b11">
+      <bpmndi:BPMNShape id="sid-E01E6D20-5407-497C-A462-C3A0D92845B6_gui" bpmnElement="sid-E01E6D20-5407-497C-A462-C3A0D92845B6" isHorizontal="true">
+        <omgdc:Bounds height="475.0" width="1350.0" x="0.0" y="107.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-DE5357BA-A002-4789-9C8C-BFE62740BF24_gui" bpmnElement="sid-DE5357BA-A002-4789-9C8C-BFE62740BF24" isHorizontal="true">
+        <omgdc:Bounds height="475.0" width="1320.0" x="30.0" y="107.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-9329FC09-BA1B-453B-B34C-B11713A46255_gui" bpmnElement="sid-9329FC09-BA1B-453B-B34C-B11713A46255">
+        <omgdc:Bounds height="30.0" width="30.0" x="60.0" y="177.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-F2EC54E7-D69F-466B-96A3-78385F1DB3CB_gui" bpmnElement="sid-F2EC54E7-D69F-466B-96A3-78385F1DB3CB">
+        <omgdc:Bounds height="80.0" width="100.0" x="135.0" y="152.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-73454FC8-D69E-41B4-841D-E8E6870E1B04_gui" bpmnElement="sid-73454FC8-D69E-41B4-841D-E8E6870E1B04">
+        <omgdc:Bounds height="80.0" width="100.0" x="1030.0" y="152.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-AC30AB02-8A00-46BB-92DF-49B1972BF77A_gui" bpmnElement="sid-AC30AB02-8A00-46BB-92DF-49B1972BF77A">
+        <omgdc:Bounds height="30.0" width="30.0" x="1176.0" y="177.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_1">
+          <omgdc:Bounds height="38.0" width="63.0" x="1160.0" y="213.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-59A38225-FF3F-4185-96CB-22D4180C5245_gui" bpmnElement="EndShipped2">
+        <omgdc:Bounds height="28.0" width="28.0" x="1280.0" y="178.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_100">
+          <omgdc:Bounds height="22.0" width="89.0" x="1250.0" y="212.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-382F031A-2A5F-474D-A986-A148D42F4662_gui" bpmnElement="sid-382F031A-2A5F-474D-A986-A148D42F4662">
+        <omgdc:Bounds height="80.0" width="100.0" x="1010.0" y="277.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-6A9F342B-1193-41BF-BF22-340E65BE1474_gui" bpmnElement="EndOrderCancelled2">
+        <omgdc:Bounds height="28.0" width="28.0" x="1170.0" y="303.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_2">
+          <omgdc:Bounds height="22.0" width="99.0" x="1100.0" y="334.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-3A7E6B25-4EA8-4A41-9B72-3DE9D47C74C0_gui" bpmnElement="sid-3A7E6B25-4EA8-4A41-9B72-3DE9D47C74C0">
+        <omgdc:Bounds height="36.0" width="30.0" x="170.0" y="214.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-1F58693B-1A07-4BFA-9977-2B2AAE5D5504_gui" bpmnElement="EndOrderCancelled1">
+        <omgdc:Bounds height="28.0" width="28.0" x="270.0" y="312.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_3">
+          <omgdc:Bounds height="38.0" width="63.0" x="253.0" y="342.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-0FE364B3-F436-4FFB-919C-F0C8B3483D77_gui" bpmnElement="sid-0FE364B3-F436-4FFB-919C-F0C8B3483D77">
+        <omgdc:Bounds height="30.0" width="30.0" x="724.0" y="177.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_4">
+          <omgdc:Bounds height="22.0" width="81.0" x="699.0" y="209.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-F939A9FD-B74B-4AC8-808E-45F9ABDB4437_gui" bpmnElement="sid-F939A9FD-B74B-4AC8-808E-45F9ABDB4437">
+        <omgdc:Bounds height="30.0" width="30.0" x="845.0" y="377.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_5">
+          <omgdc:Bounds height="54.0" width="68.0" x="826.0" y="410.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-69C544B8-87A8-4EB7-80A1-36C10C807070_gui" bpmnElement="sid-69C544B8-87A8-4EB7-80A1-36C10C807070">
+        <omgdc:Bounds height="30.0" width="30.0" x="845.0" y="482.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_6">
+          <omgdc:Bounds height="38.0" width="111.0" x="805.0" y="511.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-94C89724-EDD4-48D9-99AF-061E502E79E7_gui" bpmnElement="sid-94C89724-EDD4-48D9-99AF-061E502E79E7" isMarkerVisible="true">
+        <omgdc:Bounds height="40.0" width="40.0" x="395.0" y="172.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_7">
+          <omgdc:Bounds height="6.0" width="6.0" x="412.0" y="214.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-4CAB9C5D-6C9A-4BFF-96CA-A2197ED8048C_gui" bpmnElement="processPaymentService">
+        <omgdc:Bounds height="80.0" width="100.0" x="480.0" y="152.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-0248164A-459E-4050-8D23-EF700BED9580_gui" bpmnElement="sid-0248164A-459E-4050-8D23-EF700BED9580" isMarkerVisible="true">
+        <omgdc:Bounds height="40.0" width="40.0" x="625.0" y="172.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_8">
+          <omgdc:Bounds height="38.0" width="75.0" x="608.0" y="130.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-96C43AFB-8924-4C45-ADCB-3CACF30E4892_gui" bpmnElement="sid-96C43AFB-8924-4C45-ADCB-3CACF30E4892">
+        <omgdc:Bounds height="40.0" width="40.0" x="780.0" y="297.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_9">
+          <omgdc:Bounds height="6.0" width="6.0" x="797.0" y="339.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-6BA6113B-9EE0-4A35-900D-A4EE5C43CED9_gui" bpmnElement="sid-6BA6113B-9EE0-4A35-900D-A4EE5C43CED9">
+        <omgdc:Bounds height="30.0" width="30.0" x="695.0" y="302.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_10">
+          <omgdc:Bounds height="22.0" width="90.0" x="665.0" y="334.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-9EBE8626-3F1B-4E2F-9A31-7AD257B09798_gui" bpmnElement="sid-9EBE8626-3F1B-4E2F-9A31-7AD257B09798" isMarkerVisible="true">
+        <omgdc:Bounds height="40.0" width="40.0" x="914.0" y="297.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_11">
+          <omgdc:Bounds height="6.0" width="6.0" x="931.0" y="339.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-EE747842-EB5D-4905-80A0-73A0BCE166B2_gui" bpmnElement="sid-EE747842-EB5D-4905-80A0-73A0BCE166B2">
+        <omgdc:Bounds height="30.0" width="30.0" x="845.0" y="302.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_12">
+          <omgdc:Bounds height="22.0" width="94.0" x="813.0" y="334.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-95888210-337C-4C03-BC3D-2B60D69B6210_gui" bpmnElement="sid-95888210-337C-4C03-BC3D-2B60D69B6210">
+        <omgdc:Bounds height="80.0" width="100.0" x="810.0" y="152.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-A3B90950-4996-4066-8D10-E6395AB23860_gui" bpmnElement="sid-A3B90950-4996-4066-8D10-E6395AB23860">
+        <omgdc:Bounds height="50.0" width="50.0" x="729.0" y="3.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_13">
+          <omgdc:Bounds height="22.0" width="79.0" x="715.0" y="55.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sid-A077C184-791C-41C5-83DA-CED6B183E978_gui" bpmnElement="sid-A077C184-791C-41C5-83DA-CED6B183E978">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="875.0" y="317.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="914.0" y="317.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-BCF14BEE-0226-4B95-A2D2-7364BC0F7585_gui" bpmnElement="sid-BCF14BEE-0226-4B95-A2D2-7364BC0F7585">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="235.0" y="180.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="729.0" y="39.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-87854BEF-2EDD-46FA-926A-FFFA2CFED346_gui" bpmnElement="sid-87854BEF-2EDD-46FA-926A-FFFA2CFED346">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="875.0" y="497.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1050.0" y="497.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1050.0" y="549.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="415.0" y="549.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="415.0" y="212.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-947F3EBE-B6CF-436E-97E5-6DE3D1E903AC_gui" bpmnElement="sid-947F3EBE-B6CF-436E-97E5-6DE3D1E903AC">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1130.0" y="192.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1176.0" y="192.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-ED12FE5C-464E-46C9-8428-99AA2714BE74_gui" bpmnElement="sid-ED12FE5C-464E-46C9-8428-99AA2714BE74">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="800.0" y="337.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="800.0" y="392.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="845.0" y="392.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-764C1FB8-5259-4CA5-AF1A-10F9671814E3_gui" bpmnElement="sid-764C1FB8-5259-4CA5-AF1A-10F9671814E3">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="800.0" y="337.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="800.0" y="497.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="845.0" y="497.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-72DCAE08-07BA-4F60-A030-7E1135F47EAD_gui" bpmnElement="sid-72DCAE08-07BA-4F60-A030-7E1135F47EAD">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="779.0" y="63.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="834.0" y="152.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-C0FFAF5F-739E-4638-8F44-259C96DF508A_gui" bpmnElement="sid-C0FFAF5F-739E-4638-8F44-259C96DF508A">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="875.0" y="392.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="932.0" y="392.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="934.0" y="337.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-8D53F495-8722-495C-8331-DF1C34AC364B_gui" bpmnElement="sid-8D53F495-8722-495C-8331-DF1C34AC364B">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="954.0" y="317.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1010.0" y="317.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-CBBF786D-5FD8-4832-AAEC-F6A61EC39274_gui" bpmnElement="sid-CBBF786D-5FD8-4832-AAEC-F6A61EC39274">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="90.0" y="192.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="135.0" y="192.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-1AD2E3C3-CB73-48D4-8FA6-D59B18DAB304_gui" bpmnElement="sid-1AD2E3C3-CB73-48D4-8FA6-D59B18DAB304">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="435.0" y="192.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="480.0" y="192.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-210A1C4D-85A5-45C2-88A6-551F4807D90D_gui" bpmnElement="sid-210A1C4D-85A5-45C2-88A6-551F4807D90D">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="910.0" y="192.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1030.0" y="192.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-598E5FAA-5922-49DD-8E82-C6BFCA30CA58_gui" bpmnElement="sid-598E5FAA-5922-49DD-8E82-C6BFCA30CA58">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="580.0" y="192.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="625.0" y="192.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-CB840199-14E7-4D75-889B-6C7AD565D647_gui" bpmnElement="sid-CB840199-14E7-4D75-889B-6C7AD565D647">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="665.0" y="192.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="724.0" y="192.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-9E9F4B93-8204-4206-80BF-475F9470AA50_gui" bpmnElement="sid-9E9F4B93-8204-4206-80BF-475F9470AA50">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="645.0" y="212.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="645.0" y="317.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="695.0" y="317.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="22.0" width="20.0" x="648.0" y="245.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-AC059BC1-8E31-4C06-968F-50EB36132215_gui" bpmnElement="sid-AC059BC1-8E31-4C06-968F-50EB36132215">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="820.0" y="317.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="845.0" y="317.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-9BD856C0-4DB6-47E7-9425-8B1D3B38787E_gui" bpmnElement="sid-9BD856C0-4DB6-47E7-9425-8B1D3B38787E">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="754.0" y="192.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="810.0" y="192.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-48F5BFC5-F025-46A8-8314-501DC21099C2_gui" bpmnElement="sid-48F5BFC5-F025-46A8-8314-501DC21099C2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1040.0" y="277.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="791.0" y="50.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="sid-3A7E6B25-4EA8-4A41-9B72-3DE9D47C74C0_gui" targetElement="sid-1F58693B-1A07-4BFA-9977-2B2AAE5D5504_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="185.0" y="250.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="185.0" y="324.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="270.0" y="326.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_IntermediateThrowEvent_1" bpmnElement="IntermediateThrowEvent_1">
+        <omgdc:Bounds height="36.0" width="36.0" x="297.0" y="174.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_14">
+          <omgdc:Bounds height="22.0" width="100.0" x="265.0" y="209.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="sid-F2EC54E7-D69F-466B-96A3-78385F1DB3CB_gui" targetElement="BPMNShape_IntermediateThrowEvent_1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="235.0" y="192.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="297.0" y="192.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="BPMNShape_IntermediateThrowEvent_1" targetElement="sid-94C89724-EDD4-48D9-99AF-061E502E79E7_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="333.0" y="192.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="395.0" y="192.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="sid-AC30AB02-8A00-46BB-92DF-49B1972BF77A_gui" targetElement="sid-59A38225-FF3F-4185-96CB-22D4180C5245_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1206.0" y="192.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1280.0" y="192.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="SequenceFlow_5" sourceElement="sid-382F031A-2A5F-474D-A986-A148D42F4662_gui" targetElement="sid-6A9F342B-1193-41BF-BF22-340E65BE1474_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1110.0" y="317.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1170.0" y="317.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_6" bpmnElement="SequenceFlow_6" sourceElement="sid-6BA6113B-9EE0-4A35-900D-A4EE5C43CED9_gui" targetElement="sid-96C43AFB-8924-4C45-ADCB-3CACF30E4892_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="725.0" y="317.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="780.0" y="317.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

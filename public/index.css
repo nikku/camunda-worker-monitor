@@ -1,0 +1,44 @@
+body {
+  padding-top: 60px;
+}
+
+.content {
+  position: relative;
+}
+
+.content .header {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+
+  z-index: 100;
+  opacity: 0.6;
+}
+
+.content .header:hover {
+  opacity: 1;
+}
+
+.external-task .djs-visual > :first-child {
+  stroke: light-green !important;
+  stroke-width: 10px;
+}
+
+.external-task.failing .djs-visual > :first-child {
+  stroke: orange !important;
+}
+
+.external-task .highlight {
+  box-shadow: 0px 0px 5px 0 rgba(0,0,0,0.6);
+  border-radius: 15px;
+}
+
+.external-task.dead .highlight {
+  box-shadow: 0px 0px 5px 0 rgba(255, 0, 0, 0.6);
+  border-radius: 15px;
+}
+
+.external-task.alive .highlight {
+  box-shadow: 0px 0px 5px 0 rgba(0, 255, 0, 0.9);
+  border-radius: 15px;
+}

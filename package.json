@@ -1,0 +1,27 @@
+{
+  "name": "worker-monitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify index.js -o public/index.js -t [ stringify --extensions .bpmn --extensions .txt ]",
+    "build:watch": "watchify index.js -o public/index.js -t [ stringify --extensions .bpmn --extensions .txt ] & (sleep 4 && http-server public -o)",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nico Rehwaldt<git_nikku@nixis.de>",
+  "license": "MIT",
+  "dependencies": {
+    "bpmn-js": "^0.11.0",
+    "domify": "^1.4.0",
+    "inherits": "^2.0.1",
+    "moment": "^2.10.6",
+    "request": "^2.61.0"
+  },
+  "devDependencies": {
+    "browserify": "^11.0.1",
+    "http-server": "^0.8.0",
+    "open": "0.0.5",
+    "stringify": "^3.1.0",
+    "watchify": "^3.3.1"
+  }
+}
