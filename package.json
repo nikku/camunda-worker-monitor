@@ -12,6 +12,9 @@
   "license": "MIT",
   "dependencies": {
     "bpmn-js": "^0.11.0",
+    "debounce": "^1.0.0",
+    "dom-event": "0.0.5",
+    "dom-query": "^1.0.1",
     "domify": "^1.4.0",
     "inherits": "^2.0.1",
     "moment": "^2.10.6",
