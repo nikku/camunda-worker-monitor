@@ -14,8 +14,9 @@
       <div class="header item">
         <i class="share big red alternate square icon" title="worker monitor"></i>
       </div>
+
       <div class="item">
-        <div class="ui right icon input">
+        <div id="choose-process-form" class="ui right icon input">
           <input id="process-input"
                  type="text"
                  value=""
@@ -33,15 +34,15 @@
     </div>
 
     <div class="content">
-      <h1 class="ui dividing header">
-        Some Process Definition
+      <h1 id="header" class="ui dividing header">
+        <span class="name"></span>
+
+        <div class="sub id header"></div>
       </h1>
 
       <div id="diagram-container"></div>
     </div>
 
-    <script src="vendor/jquery.js"></script>
-    <script src="vendor/semantic.js"></script>
     <script src="index.js"></script>
   </body>
 </html>

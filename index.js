@@ -3,27 +3,67 @@ var Monitor = require('./lib/monitor');
 var query = require('dom-query');
 var on = require('dom-event').on;
 
+var forEach = require('foreach');
+
 var debounce = require('debounce');
+
+
+var queryParamDefinitions = {
+  processDefinition: /[?&]{1}processDefinition=([^&]+)/,
+  engineUrl: /[?&]{1}engineUrl=([^&]+)/
+};
 
 
 var $diagramElement = query('#diagram-container'),
     $chooserInput = query('#process-input'),
     $refreshButton = query('#refresh-button');
 
-var monitor = new Monitor($diagramElement);
 
+// you may specify another url via the ?engineUrl=... parameter
+var engineUrl = 'http://localhost:8080/engine-rest';
 
-function updateMonitor() {
-  if ($chooserInput.value) {
-    monitor.show($chooserInput.value);
-  }
+var params = extractParamsFromUrl();
+
+if (params.processDefinition) {
+  // set process definition id
+  $chooserInput.value = params.processDefinition;
+}
+
+if (params.engineUrl) {
+  engineUrl = params.engineUrl;
 }
 
 
-function extractProcessDefinitionFromUrl() {
-  var match = location.search.match(/[?&]{1}processDefinition=([^&]+)/);
+var monitor = new Monitor($diagramElement, engineUrl);
 
-  return match && match[1];
+function updateMonitor() {
+  if ($chooserInput.value) {
+    monitor.show($chooserInput.value, function(err, definitions) {
+      var definition;
+
+      if (definitions.length === 1) {
+        definition = definitions[0];
+
+        $chooserInput.value = definition.key;
+
+        query('#header').textContent = definition.name;
+      }
+    });
+  }
+}
+
+function extractParamsFromUrl() {
+  var data = {};
+
+  forEach(queryParamDefinitions, function(regex, name) {
+    var match = location.search.match(regex);
+
+    if (match) {
+      data[name] = decodeURIComponent(match[1]);
+    }
+  });
+
+  return data;
 }
 
 
@@ -36,10 +76,6 @@ on($refreshButton, 'click', function() {
 
   monitor.refresh();
 });
-
-
-// set process definition id
-$chooserInput.value = decodeURIComponent(extractProcessDefinitionFromUrl() || 'some:process:def');
 
 
 // initial check
