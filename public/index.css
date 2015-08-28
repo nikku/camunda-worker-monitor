@@ -45,3 +45,8 @@ body {
 
   border-radius: 15px;
 }
+
+
+.ui.icon.label .icon {
+  margin: 0em;
+}
