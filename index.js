@@ -18,10 +18,6 @@ var $diagramElement = query('#diagram-container'),
     $chooserInput = query('#process-input'),
     $refreshButton = query('#refresh-button');
 
-
-// you may specify another url via the ?engineUrl=... parameter
-var engineUrl = 'http://localhost:8080/engine-rest';
-
 var params = extractParamsFromUrl();
 
 if (params.processDefinition) {
@@ -29,14 +25,13 @@ if (params.processDefinition) {
   $chooserInput.value = params.processDefinition;
 }
 
-if (params.engineUrl) {
-  engineUrl = params.engineUrl;
-}
-
+// you may specify another url via the ?engineUrl=... parameter
+var engineUrl = params.engineUrl || 'http://localhost:8080/engine-rest';
 
 var monitor = new Monitor($diagramElement, engineUrl);
 
 function updateMonitor() {
+
   if ($chooserInput.value) {
     monitor.show($chooserInput.value, function(err, definitions) {
       var definition;
